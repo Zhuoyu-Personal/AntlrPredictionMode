@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using Antlr4.Runtime;
 using Antlr4.Runtime.Atn;
 using Antlr4.Runtime.Misc;
@@ -22,11 +23,11 @@ public sealed class ParseModeRunner
         try
         {
             parser.prog();
-            return ParseResult.Success("SLL", usedFallback: false, diagnostics.Messages);
+            return ParseResult.CreateSuccess("SLL", usedFallback: false, diagnostics.Messages);
         }
         catch (Exception ex)
         {
-            return ParseResult.Failure("SLL", usedFallback: false, ex.Message, diagnostics.Messages);
+            return ParseResult.CreateFailure("SLL", usedFallback: false, ex.Message, diagnostics.Messages);
         }
     }
 
@@ -50,11 +51,11 @@ public sealed class ParseModeRunner
         try
         {
             parser.prog();
-            return ParseResult.Success("LL", usedFallback: true, diagnostics.Messages);
+            return ParseResult.CreateSuccess("LL", usedFallback: true, diagnostics.Messages);
         }
         catch (Exception ex)
         {
-            return ParseResult.Failure("LL", usedFallback: true, ex.Message, diagnostics.Messages);
+            return ParseResult.CreateFailure("LL", usedFallback: true, ex.Message, diagnostics.Messages);
         }
     }
 
@@ -74,11 +75,12 @@ public sealed class PredictionDiagnostics : BaseErrorListener
     public IReadOnlyList<string> Messages => _messages;
 
     public override void SyntaxError(
-        [NotNull] IRecognizer recognizer,
+        TextWriter output,
+        IRecognizer recognizer,
         IToken offendingSymbol,
         int line,
         int charPositionInLine,
-        [NotNull] string msg,
+        string msg,
         RecognitionException e)
     {
         _messages.Add($"SyntaxError at {line}:{charPositionInLine} => {msg}");
@@ -106,9 +108,9 @@ public sealed class ParseResult
 
     public IReadOnlyList<string> Diagnostics { get; }
 
-    public static ParseResult Success(string mode, bool usedFallback, IReadOnlyList<string> diagnostics)
+    public static ParseResult CreateSuccess(string mode, bool usedFallback, IReadOnlyList<string> diagnostics)
         => new ParseResult(mode, success: true, usedFallback, error: null, diagnostics);
 
-    public static ParseResult Failure(string mode, bool usedFallback, string error, IReadOnlyList<string> diagnostics)
+    public static ParseResult CreateFailure(string mode, bool usedFallback, string error, IReadOnlyList<string> diagnostics)
         => new ParseResult(mode, success: false, usedFallback, error, diagnostics);
 }

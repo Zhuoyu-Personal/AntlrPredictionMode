@@ -13,6 +13,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Remove="Generated\Grammar\*.cs" />
+    <None Include="Generated\Grammar\*.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Antlr4 Include="Grammar\PredictionDemo.g4"
             Generator="MSBuild:Compile"
             Listener="false"
