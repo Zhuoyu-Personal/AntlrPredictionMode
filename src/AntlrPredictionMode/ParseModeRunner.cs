@@ -58,12 +58,12 @@ public sealed class ParseModeRunner
         }
     }
 
-    private static PredictionDemoParser BuildParser(string source)
+    private static global::PredictionDemoParser BuildParser(string source)
     {
         var input = new AntlrInputStream(source);
-        var lexer = new PredictionDemoLexer(input);
+        var lexer = new global::PredictionDemoLexer(input);
         var tokens = new CommonTokenStream(lexer);
-        return new PredictionDemoParser(tokens);
+        return new global::PredictionDemoParser(tokens);
     }
 }
 
