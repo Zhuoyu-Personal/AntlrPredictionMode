@@ -1,49 +1,78 @@
 # AntlrPredictionMode (.NET Framework 4.8)
 
-This repository demonstrates ANTLR4 parsing behavior differences between **SLL** and **LL** prediction modes using a .NET Framework 4.8 project.
+This repo is a **hands-on ANTLR4 demo** for understanding how parsing behaves in:
 
-## What is included
+- **SLL only** mode (fast, can fail on ambiguous contexts)
+- **SLL -> LL fallback** mode (practical production strategy)
 
-- A .NET Framework 4.8 console project
-- A non-trivial grammar file: `src/AntlrPredictionMode/Grammar/PredictionDemo.g4`
-- ANTLR4 C# runtime via NuGet (`Antlr4.Runtime.Standard`)
-- Build-time grammar code generation via `Antlr4BuildTasks`
-- A test project with multiple focused cases for SLL vs LL behavior
+---
 
-## Why this grammar?
+## 1) Prerequisites
 
-The grammar intentionally combines:
+You need a machine with:
 
-- expression statements vs assignment statements
-- function-call expressions
-- nested call syntax
+- .NET SDK (8+ is fine) or Visual Studio 2022
+- ability to restore NuGet packages
 
-These constructs create prefixes that are easy to parse with SLL in many cases, but may require LL fallback in ambiguous contexts.
+> This project targets **`net48`** and uses `Microsoft.NETFramework.ReferenceAssemblies`, so it can be built on non-Windows hosts too.
 
-## Running locally
+---
 
-1. Install .NET SDK that can build `net48` projects.
-2. Restore and build:
+## 2) How to run the program
+
+From repository root:
 
 ```bash
 dotnet restore
-dotnet build
-```
-
-3. Run the demo app:
-
-```bash
 dotnet run --project src/AntlrPredictionMode/AntlrPredictionMode.csproj
 ```
 
-4. Run tests:
+The app prints each sample input and shows:
+
+- SLL-only result
+- SLL->LL fallback result
+- parse/diagnostic errors (if any)
+
+---
+
+## 3) How to run the tests
 
 ```bash
 dotnet test
 ```
 
-## Expected learning outcomes
+Test cases are in:
 
-- See where strict SLL parsing can fail fast.
-- See how two-stage parsing (SLL + LL fallback) recovers those cases.
-- Inspect parser diagnostics that indicate full-context attempts.
+- `tests/AntlrPredictionMode.Tests/PredictionModeTests.cs`
+
+---
+
+## 4) Generated parser code (checked in)
+
+The grammar is:
+
+- `src/AntlrPredictionMode/Grammar/PredictionDemo.g4`
+
+Generated C# parser/lexer files are checked in under:
+
+- `src/AntlrPredictionMode/Generated/Grammar/`
+
+This means you can inspect parser code directly in the repo without building first.
+
+### Regenerate parser files
+
+```bash
+./scripts_generate_parser.sh
+```
+
+---
+
+## 5) Grammar intent
+
+The grammar intentionally mixes:
+
+- expression statements
+- assignment statements
+- call expressions with nesting
+
+Examples like `f(x)=y;` and `f(g(x))=y;` are useful when exploring where SLL may need extra context and when LL fallback helps.
